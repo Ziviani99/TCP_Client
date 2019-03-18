@@ -26,11 +26,11 @@ public class TCP_Server1 {
         // TODO code application logic here
         Locale.setDefault(Locale.US);
         DecimalFormat df = new DecimalFormat("###,##0.00");
-        // TODO code application logic here
+        
         ServerSocket serverSocket = new ServerSocket(9001);
 	 // waits for a new connection. Accepts connetion from multiple clients
 	 while (true) {
-	    System.out.println("Esperando conexão na porta 9000");
+	    System.out.println("Esperando conexão na porta 9001");
             Socket s = serverSocket.accept();
 	    System.out.println("Conexão estabelecida de " + s.getInetAddress());
 			 
@@ -39,43 +39,45 @@ public class TCP_Server1 {
 	    BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 	    String input = br.readLine();
             
+            //create output stream to write to/send TO CLINET
+            DataOutputStream output = new DataOutputStream(s.getOutputStream());
+            
             //linhas adicionadas
             String[] vect = input.split(" ");
             
-            for(int i = 0; i < input.length(); i++){
-                if(Integer.parseInt(vect[0]) == 1){
-                    double altura = Double.parseDouble(vect[1]);
-                    double peso = Double.parseDouble(vect[2]);
+            try{
+                if (vect.length < 3) {
+                    double altura = Double.parseDouble(vect[0]);
+                    double peso = Double.parseDouble(vect[1]);
                     double IMC = 0;
-                    
-                    IMC = peso/(altura * altura);
-                    
-                    if (IMC <= 19){
-                        input = "IMC: " + df.format(IMC) + ", abaixo do peso"; 
+
+                    IMC = peso / (altura * altura);
+                    IMC = IMC * 10000;
+
+                    if (IMC <= 19) {
+                        input = "IMC: " + df.format(IMC) + ", abaixo do peso";
+                    } else if (IMC <= 25) {
+                        input = "IMC: " + df.format(IMC) + ", peso ideal";
+                    } else if (IMC <= 30) {
+                        input = "IMC: " + df.format(IMC) + ", acima do peso";
+                    } else if (IMC <= 35) {
+                        input = "IMC: " + df.format(IMC) + ", obesidade leve";
+                    } else {
+                        input = "IMC: " + df.format(IMC) + ", obesidade";
                     }
-                    else
-                    if (IMC <= 25){
-                        input = "IMC: " + df.format(IMC) + ", peso ideal"; 
-                    }
-                    else
-                    if (IMC <= 30){
-                        input = "IMC: " + df.format(IMC) + ", acima do peso"; 
-                    }
-                    else
-                    if (IMC <= 35){
-                        input = "IMC: " + df.format(IMC) + ", obesidade leve"; 
-                    }
-                    else
-                        input = "IMC: " + df.format(IMC) + ", obesidade"; 
+                    //Como a frase pode retornar
+                    output.writeBytes(input + "\n");
+                } else {
+                    //Como a frase pode retornar
+                    output.writeBytes(input.toUpperCase() + " - Mensagem maiuscula" + "\n");
                 }
             }
-            //
-            
-	    //create output stream to write to/send TO CLINET
-            DataOutputStream output = new DataOutputStream(s.getOutputStream());
-            
-            //Mudança de como a frase é retornada
-	    output.writeBytes(input + "\n");
+            catch(NumberFormatException e){
+                //Como a frase pode retornar caso a pessoa digite uma frase com duas palavras ou letras
+                output.writeBytes("Como você digitou duas palavras ao invés de números sua mensagem foi transformada"
+                        + " ao invés de ser calculado seu IMC - "
+                        + input.toUpperCase() + " - Mensagem maiuscula" + "\n");
+            }
 	    // close current connection
 	    s.close();
          }
