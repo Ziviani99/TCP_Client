@@ -24,7 +24,9 @@ public class TCP_Server1 {
      */
     public static void main(String[] args) throws Exception {
         // TODO code application logic here
+        //Define o local como EUA, deixando o ponto como padrão
         Locale.setDefault(Locale.US);
+        //Faz a formatação de números depois da vírgula
         DecimalFormat df = new DecimalFormat("###,##0.00");
         
         ServerSocket serverSocket = new ServerSocket(9001);
@@ -42,11 +44,12 @@ public class TCP_Server1 {
             //create output stream to write to/send TO CLINET
             DataOutputStream output = new DataOutputStream(s.getOutputStream());
             
-            //linhas adicionadas
+            //Cria um vetor contendo as palavras e/ou letras contidas na string input
             String[] vect = input.split(" ");
             
+            //Tenta executar o código, e caso der erro, tratar
             try{
-                if (vect.length < 3) {
+                if (vect.length == 2) {
                     double altura = Double.parseDouble(vect[0]);
                     double peso = Double.parseDouble(vect[1]);
                     double IMC = 0;
@@ -72,6 +75,7 @@ public class TCP_Server1 {
                     output.writeBytes(input.toUpperCase() + " - Mensagem maiuscula" + "\n");
                 }
             }
+            //Tratamento de exceção
             catch(NumberFormatException e){
                 //Como a frase pode retornar caso a pessoa digite uma frase com duas palavras ou letras
                 output.writeBytes("Como você digitou duas palavras ao invés de números sua mensagem foi transformada"
@@ -82,5 +86,4 @@ public class TCP_Server1 {
 	    s.close();
          }
     }
-    
 }
